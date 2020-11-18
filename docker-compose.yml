@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  php-apache:
+    container_name: activity.local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    labels:
+      - traefik.enable=true
+      - traefik.http.frontend.rule=Host:activity.local,www.activity.local
+      - traefik.http.frontend.entryPoints=http
+      - traefik.http.port=8080
+      - traefik.https.frontend.rule=Host:activity.local,www.activity.local
+      - traefik.https.frontend.entryPoints=https
+      - traefik.https.protocol=https
+      - traefik.https.port=8080
+    # Must add extra_hosts to be written to /etc/hosts - otherwise containerized application can not curl itself
+    environment:
+      - DB_HOST=mysql
+#      - DB_PORT=3357
+      - DB_USER=activiti
+      - DB_PASS=password
+      - DB_NAME=activiti_production
+
+    external_links:
+      - mysql57:mysql
+#    networks:
+#      - reverse-proxy
+    network_mode: bridge
